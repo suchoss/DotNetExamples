@@ -56,6 +56,26 @@ namespace SortedListOrDictionary
             return _sortedDictionary.Count(kvp => kvp.Key.StartsWith("s"));
         }
         
+        [Benchmark]
+        public int StartsWithSearchInSortedDictionaryCustomSearch()
+        {
+            using var enumerator = _sortedDictionary.GetEnumerator();
+            int count = 0;
+            while (enumerator.MoveNext())
+            {
+                if (enumerator.Current.Key.StartsWith("s"))
+                {
+                    count++;
+                }
+                else
+                {
+                    if (count > 0)
+                        break;
+                }
+            }
+            return count;
+        }
+        
         [Benchmark] //compare against ordinary list
         public int StartsWithSearchInList()
         {
@@ -97,13 +117,23 @@ namespace SortedListOrDictionary
         }
         
         [Benchmark]
-        public string ExactKeyStartsWithSearchInSortedDictionary()
+        public string ExactKeySearchInSortedDictionary()
         {
             _sortedDictionary.TryGetValue(_firstKey, out var first);
             _sortedDictionary.TryGetValue(_secondKey, out var second);
             _sortedDictionary.TryGetValue(_thirdKey, out var third);
 
             return first + second + third;
+        }
+        
+        [Benchmark]
+        public string ExactKeySearchInList()
+        {
+            var first = _randomWords.FirstOrDefault(rw => rw.Key == _firstKey);
+            var second = _randomWords.FirstOrDefault(rw => rw.Key == _secondKey);
+            var third = _randomWords.FirstOrDefault(rw => rw.Key == _thirdKey);
+            
+            return first.Value + second.Value + third.Value;
         }
         
     }
